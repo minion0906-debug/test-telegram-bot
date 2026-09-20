@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+datasource db {
+  provider = "sqlite"
+  url = env("DATABASE_URL")
+}
+
+
+model TelegramUser {
+
+  id Int @id @default(autoincrement())
+
+
+  telegramId String @unique
+
+
+  username String?
+
+  firstName String?
+
+  lastName String?
+
+
+  phone String?
+
+  country String?
+
+  gender String?
+
+
+  languageCode String?
+
+
+  photoUrl String?
+
+
+  chatId String?
+
+
+  step String @default("START")
+
+
+  lastActive DateTime?
+
+
+  createdAt DateTime @default(now())
+
+
+  updatedAt DateTime @updatedAt
+
+
+  notes Note[]
+
+}
+
+
+
+model Note {
+
+  id Int @id @default(autoincrement())
+
+
+  text String
+
+
+  userId Int
+
+
+  user TelegramUser @relation(
+    fields:[userId],
+    references:[id],
+    onDelete:Cascade
+  )
+
+
+  createdAt DateTime @default(now())
+
+}
+
+
+
+model Broadcast {
+
+  id Int @id @default(autoincrement())
+
+  message String
+
+  total Int @default(0)
+
+  sentCount Int @default(0)
+
+  failedCount Int @default(0)
+
+  status String @default("PENDING")
+
+  createdAt DateTime @default(now())
+
+  logs BroadcastLog[]
+
+}
+
+
+model BroadcastLog {
+
+  id Int @id @default(autoincrement())
+
+  userId Int
+
+  broadcastId Int
+
+  success Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  user TelegramUser @relation(fields:[userId], references:[id], onDelete:Cascade)
+
+  broadcast Broadcast @relation(fields:[broadcastId], references:[id], onDelete:Cascade)
+
+}
+
+model Admin {
+
+  id Int @id @default(autoincrement())
+
+  email String @unique
+
+  password String
+
+  role String @default("ADMIN")
+
+  createdAt DateTime @default(now())
+
+}
